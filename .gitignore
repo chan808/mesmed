@@ -1,5 +1,6 @@
 HELP.md
 .gradle
+.gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -35,3 +36,26 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Antigravity & Agent Internals
+.antigravity/
+.jetski/
+.tengu/
+
+# OS and Log files
+.DS_Store
+Thumbs.db
+*.log
+
+# Frontend (If any)
+node_modules/
+dist/
+
+# Python (If any)
+venv/
+.venv/
+__pycache__/
+
+# AI
+.claude/
+AGENTS.md
