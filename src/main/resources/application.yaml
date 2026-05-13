@@ -1,3 +1,28 @@
 spring:
   application:
     name: medmes
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mes_db
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop   # 개발용. 운영 전환 시 validate로 변경
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+jwt:
+  secret: ${JWT_SECRET:medmes-jwt-secret-key-must-be-at-least-32-bytes-long}
+  expiration-ms: ${JWT_EXPIRATION_MS:3600000}   # 1시간
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+server:
+  port: 8080
