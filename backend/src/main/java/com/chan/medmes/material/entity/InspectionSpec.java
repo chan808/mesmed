@@ -1,5 +1,9 @@
 package com.chan.medmes.material.entity;
 
+import com.chan.medmes.material.enums.InspectionCategory;
+import com.chan.medmes.material.enums.InspectionEquipment;
+import com.chan.medmes.material.enums.InspectionMethod;
+import com.chan.medmes.material.enums.InspectionTiming;
 import com.chan.medmes.material.enums.MeasureType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -23,20 +27,37 @@ public class InspectionSpec {
     @JoinColumn(name = "raw_material_id", nullable = false)
     private RawMaterial rawMaterial;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private InspectionCategory category;
+
     @Column(name = "item_name", nullable = false, length = 100)
     private String itemName;
 
     @Column(name = "spec_desc", length = 300)
     private String specDesc;
 
-    @Column(length = 50)
-    private String method;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private InspectionMethod method;
 
-    @Column(length = 100)
-    private String equipment;
+    // method == OTHER 일 때 자유 입력
+    @Column(name = "method_custom", length = 50)
+    private String methodCustom;
 
-    @Column(length = 50)
-    private String timing;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
+    private InspectionEquipment equipment;
+
+    @Column(name = "equipment_custom", length = 100)
+    private String equipmentCustom;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private InspectionTiming timing;
+
+    @Column(name = "timing_custom", length = 50)
+    private String timingCustom;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "measure_type", length = 10, nullable = false)
@@ -59,16 +80,24 @@ public class InspectionSpec {
     private LocalDateTime supersededAt;
 
     @Builder
-    public InspectionSpec(RawMaterial rawMaterial, String itemName, String specDesc,
-                          String method, String equipment, String timing,
+    public InspectionSpec(RawMaterial rawMaterial,
+                          InspectionCategory category,
+                          String itemName, String specDesc,
+                          InspectionMethod method, String methodCustom,
+                          InspectionEquipment equipment, String equipmentCustom,
+                          InspectionTiming timing, String timingCustom,
                           MeasureType measureType, Double minValue, Double maxValue,
                           String unit, Integer version) {
         this.rawMaterial = rawMaterial;
+        this.category = (category != null) ? category : InspectionCategory.OTHER;
         this.itemName = itemName;
         this.specDesc = specDesc;
         this.method = method;
+        this.methodCustom = (method == InspectionMethod.OTHER) ? methodCustom : null;
         this.equipment = equipment;
+        this.equipmentCustom = (equipment == InspectionEquipment.OTHER) ? equipmentCustom : null;
         this.timing = timing;
+        this.timingCustom = (timing == InspectionTiming.OTHER) ? timingCustom : null;
         this.measureType = (measureType != null) ? measureType : MeasureType.VISUAL;
         this.minValue = minValue;
         this.maxValue = maxValue;

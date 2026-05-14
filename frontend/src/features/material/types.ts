@@ -1,5 +1,9 @@
 import type {
+  InspectionCategory,
+  InspectionEquipment,
+  InspectionMethod,
   InspectionResult,
+  InspectionTiming,
   LotStatus,
   MeasureType,
 } from '../../shared/api/types';
@@ -38,11 +42,15 @@ export interface InspectionSpec {
   id: number;
   rawMaterialId: number;
   rawMaterialName: string;
+  category: InspectionCategory;
   itemName: string;
   specDesc: string | null;
-  method: string | null;
-  equipment: string | null;
-  timing: string | null;
+  method: InspectionMethod | null;
+  methodCustom: string | null;
+  equipment: InspectionEquipment | null;
+  equipmentCustom: string | null;
+  timing: InspectionTiming | null;
+  timingCustom: string | null;
   measureType: MeasureType;
   minValue: number | null;
   maxValue: number | null;
@@ -52,11 +60,15 @@ export interface InspectionSpec {
 
 export interface InspectionSpecCreateRequest {
   rawMaterialId: number;
+  category?: InspectionCategory;
   itemName: string;
   specDesc?: string;
-  method?: string;
-  equipment?: string;
-  timing?: string;
+  method?: InspectionMethod;
+  methodCustom?: string;
+  equipment?: InspectionEquipment;
+  equipmentCustom?: string;
+  timing?: InspectionTiming;
+  timingCustom?: string;
   measureType?: MeasureType;
   minValue?: number;
   maxValue?: number;

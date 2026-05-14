@@ -4,6 +4,24 @@ import { materialApi, specApi } from './api';
 import { useAuth } from '../../shared/auth/useAuth';
 import { errorMessage } from '../../shared/api/client';
 import { formatDateTime } from '../../shared/util/format';
+import {
+  CATEGORY_LABEL,
+  EQUIPMENT_LABEL,
+  METHOD_LABEL,
+} from '../../shared/api/types';
+import type { InspectionSpec } from './types';
+
+function renderMethod(s: InspectionSpec): string {
+  if (!s.method) return '-';
+  if (s.method === 'OTHER') return s.methodCustom ?? '기타';
+  return METHOD_LABEL[s.method];
+}
+
+function renderEquipment(s: InspectionSpec): string {
+  if (!s.equipment) return '-';
+  if (s.equipment === 'OTHER') return s.equipmentCustom ?? '기타';
+  return EQUIPMENT_LABEL[s.equipment];
+}
 
 export function MaterialDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -106,6 +124,7 @@ export function MaterialDetailPage() {
           <table>
             <thead>
               <tr>
+                <th>분류</th>
                 <th>항목</th>
                 <th>규격</th>
                 <th>측정 유형</th>
@@ -119,6 +138,7 @@ export function MaterialDetailPage() {
             <tbody>
               {specs.map((s) => (
                 <tr key={s.id}>
+                  <td>{CATEGORY_LABEL[s.category]}</td>
                   <td>{s.itemName}</td>
                   <td className="muted">{s.specDesc ?? '-'}</td>
                   <td>{s.measureType}</td>
@@ -127,8 +147,8 @@ export function MaterialDetailPage() {
                       ? `${s.minValue ?? '-'} ~ ${s.maxValue ?? '-'} ${s.unit ?? ''}`
                       : '-'}
                   </td>
-                  <td>{s.method ?? '-'}</td>
-                  <td>{s.equipment ?? '-'}</td>
+                  <td>{renderMethod(s)}</td>
+                  <td>{renderEquipment(s)}</td>
                   <td className="num">{s.version}</td>
                   {isAdmin && (
                     <td>
