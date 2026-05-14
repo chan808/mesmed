@@ -1,0 +1,61 @@
+HELP.md
+.gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+# Antigravity & Agent Internals
+.antigravity/
+.jetski/
+.tengu/
+
+# OS and Log files
+.DS_Store
+Thumbs.db
+*.log
+
+# Frontend (If any)
+node_modules/
+dist/
+
+# Python (If any)
+venv/
+.venv/
+__pycache__/
+
+# AI
+.claude/
+AGENTS.md
