@@ -7,7 +7,7 @@ import java.util.List;
 
 public record LotHistoryResponse(
         LotInfo lot,
-        InspectionRecordInfo inspectionRecord,
+        List<InspectionRecordInfo> inspectionRecords,
         List<ProductionLogInfo> productionLogs
 ) {
     public record LotInfo(

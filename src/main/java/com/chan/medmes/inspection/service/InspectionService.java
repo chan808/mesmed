@@ -11,11 +11,9 @@ import com.chan.medmes.inspection.error.InspectionErrorCode;
 import com.chan.medmes.inspection.repository.InspectionDetailRepository;
 import com.chan.medmes.inspection.repository.InspectionRecordRepository;
 import com.chan.medmes.material.LotStatus;
-import com.chan.medmes.material.MaterialErrorCode;
 import com.chan.medmes.material.entity.InspectionSpec;
 import com.chan.medmes.material.entity.Lot;
-import com.chan.medmes.material.repository.InspectionSpecRepository;
-import com.chan.medmes.material.repository.LotRepository;
+import com.chan.medmes.material.service.MaterialService;
 import com.chan.medmes.user.entity.User;
 import com.chan.medmes.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -31,14 +29,12 @@ public class InspectionService {
 
     private final InspectionRecordRepository recordRepository;
     private final InspectionDetailRepository detailRepository;
-    private final LotRepository lotRepository;
-    private final InspectionSpecRepository specRepository;
+    private final MaterialService materialService;
     private final UserService userService;
 
     @Transactional
     public InspectionResponse createInspection(InspectionRequest request) {
-        Lot lot = lotRepository.findById(request.lotId())
-                .orElseThrow(() -> new BusinessException(MaterialErrorCode.LOT_NOT_FOUND));
+        Lot lot = materialService.findLotEntityById(request.lotId());
 
         User inspector = (request.inspectorId() != null)
                 ? userService.findEntityById(request.inspectorId())
@@ -61,7 +57,7 @@ public class InspectionService {
         InspectionResult overall = anyFail ? InspectionResult.FAIL : InspectionResult.PASS;
 
         record.conclude(overall);
-        lot.updateStatus(anyFail ? LotStatus.FAIL : LotStatus.PASS);
+        lot.applyInspectionResult(anyFail ? LotStatus.FAIL : LotStatus.PASS);
 
         return InspectionResponse.from(record, details);
     }
@@ -81,8 +77,13 @@ public class InspectionService {
     }
 
     private InspectionDetail buildDetail(InspectionRecord record, InspectionDetailItem item) {
-        InspectionSpec spec = specRepository.findById(item.inspectionSpecId())
-                .orElseThrow(() -> new BusinessException(InspectionErrorCode.SPEC_NOT_FOUND));
+        InspectionSpec spec = materialService.findSpecEntityById(item.inspectionSpecId());
+
+        Long lotMaterialId = record.getLot().getRawMaterial().getId();
+        if (!spec.getRawMaterial().getId().equals(lotMaterialId)) {
+            throw new BusinessException(InspectionErrorCode.SPEC_MATERIAL_MISMATCH);
+        }
+
         return InspectionDetail.builder()
                 .record(record)
                 .spec(spec)

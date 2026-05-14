@@ -13,7 +13,8 @@ public enum MaterialErrorCode implements ErrorCode {
     LOT_NOT_FOUND(404, "LOT를 찾을 수 없습니다."),
     LOT_NO_DUPLICATED(409, "이미 존재하는 LOT 번호입니다."),
     SPEC_NOT_FOUND(404, "검사기준을 찾을 수 없습니다."),
-    NO_INSPECTION_SPEC(400, "등록된 검사기준이 없습니다. 검사기준을 먼저 등록해주세요.");
+    NO_INSPECTION_SPEC(400, "등록된 검사기준이 없습니다. 검사기준을 먼저 등록해주세요."),
+    INVALID_STATUS_TRANSITION(400, "허용되지 않는 LOT 상태 전이입니다.");
 
     private final int status;
     private final String message;

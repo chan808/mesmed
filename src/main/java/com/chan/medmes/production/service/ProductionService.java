@@ -1,10 +1,9 @@
 package com.chan.medmes.production.service;
 
 import com.chan.medmes.global.error.BusinessException;
-import com.chan.medmes.material.entity.Lot;
 import com.chan.medmes.material.LotStatus;
-import com.chan.medmes.material.MaterialErrorCode;
-import com.chan.medmes.material.repository.LotRepository;
+import com.chan.medmes.material.entity.Lot;
+import com.chan.medmes.material.service.MaterialService;
 import com.chan.medmes.production.dto.*;
 import com.chan.medmes.production.entity.AlarmLog;
 import com.chan.medmes.production.entity.Equipment;
@@ -29,7 +28,7 @@ public class ProductionService {
     private final ProductionLogRepository productionLogRepository;
     private final EquipmentRepository equipmentRepository;
     private final AlarmLogRepository alarmLogRepository;
-    private final LotRepository lotRepository;
+    private final MaterialService materialService;
 
     // ── Equipment ─────────────────────────────────────────────────
 
@@ -67,11 +66,14 @@ public class ProductionService {
 
     @Transactional
     public ProductionLogResponse createProductionLog(ProductionLogRequest request) {
-        Lot lot = lotRepository.findById(request.lotId())
-                .orElseThrow(() -> new BusinessException(MaterialErrorCode.LOT_NOT_FOUND));
+        Lot lot = materialService.findLotEntityById(request.lotId());
 
         if (lot.getStatus() != LotStatus.PASS) {
             throw new BusinessException(ProductionErrorCode.LOT_NOT_PASSED);
+        }
+
+        if (request.defectQty() != null && request.defectQty() > request.producedQty()) {
+            throw new BusinessException(ProductionErrorCode.DEFECT_EXCEEDS_PRODUCED);
         }
 
         Equipment equipment = (request.equipmentId() != null)

@@ -1,6 +1,8 @@
 package com.chan.medmes.material.entity;
 
+import com.chan.medmes.global.error.BusinessException;
 import com.chan.medmes.material.LotStatus;
+import com.chan.medmes.material.MaterialErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -50,7 +52,16 @@ public class Lot {
         this.status = LotStatus.PENDING;
     }
 
-    public void updateStatus(LotStatus status) {
-        this.status = status;
+    // 관리자 수동 전이: PENDING/FAIL/HOLD → HOLD만 허용
+    public void holdManually() {
+        if (this.status == LotStatus.PASS) {
+            throw new BusinessException(MaterialErrorCode.INVALID_STATUS_TRANSITION);
+        }
+        this.status = LotStatus.HOLD;
+    }
+
+    // 수입검사 완료 시 자동 전이
+    public void applyInspectionResult(LotStatus result) {
+        this.status = result;
     }
 }

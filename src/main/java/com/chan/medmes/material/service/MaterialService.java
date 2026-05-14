@@ -1,6 +1,7 @@
 package com.chan.medmes.material.service;
 
 import com.chan.medmes.global.error.BusinessException;
+import com.chan.medmes.material.LotStatus;
 import com.chan.medmes.material.MaterialErrorCode;
 import com.chan.medmes.material.dto.*;
 import com.chan.medmes.material.entity.InspectionSpec;
@@ -110,7 +111,10 @@ public class MaterialService {
     @Transactional
     public LotResponse updateLotStatus(Long id, LotStatusRequest request) {
         Lot lot = findLotEntityById(id);
-        lot.updateStatus(request.status());
+        if (request.status() != LotStatus.HOLD) {
+            throw new BusinessException(MaterialErrorCode.INVALID_STATUS_TRANSITION);
+        }
+        lot.holdManually();
         return LotResponse.from(lot);
     }
 

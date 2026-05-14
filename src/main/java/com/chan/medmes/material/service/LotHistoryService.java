@@ -41,16 +41,17 @@ public class LotHistoryService {
                 lot.getStatus()
         );
 
-        List<InspectionRecord> records = inspectionRecordRepository.findByLotId(lotId);
-        LotHistoryResponse.InspectionRecordInfo inspectionInfo = records.isEmpty() ? null
-                : toInspectionRecordInfo(records.get(0));
+        List<LotHistoryResponse.InspectionRecordInfo> inspectionInfos =
+                inspectionRecordRepository.findByLotId(lotId).stream()
+                        .map(this::toInspectionRecordInfo)
+                        .toList();
 
         List<LotHistoryResponse.ProductionLogInfo> productionInfos =
                 productionLogRepository.findByLotId(lotId).stream()
                         .map(this::toProductionLogInfo)
                         .toList();
 
-        return new LotHistoryResponse(lotInfo, inspectionInfo, productionInfos);
+        return new LotHistoryResponse(lotInfo, inspectionInfos, productionInfos);
     }
 
     private LotHistoryResponse.InspectionRecordInfo toInspectionRecordInfo(InspectionRecord record) {
