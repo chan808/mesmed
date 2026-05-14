@@ -7,6 +7,7 @@ import com.chan.medmes.inspection.service.InspectionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class InspectionController {
 
     private final InspectionService inspectionService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'INSPECTOR')")
     @PostMapping("/inspections")
     public ResponseEntity<ApiResponse<InspectionResponse>> create(
             @RequestBody @Valid InspectionRequest request) {

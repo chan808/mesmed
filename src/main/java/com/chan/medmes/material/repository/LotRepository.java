@@ -1,5 +1,6 @@
 package com.chan.medmes.material.repository;
 
+import com.chan.medmes.material.LotStatus;
 import com.chan.medmes.material.entity.Lot;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,4 +12,5 @@ public interface LotRepository extends JpaRepository<Lot, Long> {
     long countByLotNoStartingWith(String prefix);
     List<Lot> findAllByDeletedAtIsNull();
     Optional<Lot> findByIdAndDeletedAtIsNull(Long id);
+    long countByStatusAndDeletedAtIsNull(LotStatus status);
 }

@@ -10,6 +10,7 @@ import com.chan.medmes.material.service.MaterialService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,6 +44,7 @@ public class LotController {
         return ResponseEntity.ok(ApiResponse.success(lotHistoryService.getHistory(id)));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/status")
     public ResponseEntity<ApiResponse<LotResponse>> updateStatus(
             @PathVariable Long id,
@@ -50,6 +52,7 @@ public class LotController {
         return ResponseEntity.ok(ApiResponse.success(materialService.updateLotStatus(id, request)));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         materialService.deleteLot(id);

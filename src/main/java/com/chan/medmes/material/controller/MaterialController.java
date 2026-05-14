@@ -9,6 +9,7 @@ import com.chan.medmes.material.service.MaterialService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class MaterialController {
         return ResponseEntity.ok(ApiResponse.success(materialService.getAllMaterials()));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ApiResponse<RawMaterialResponse>> create(
             @RequestBody @Valid RawMaterialRequest request) {
@@ -36,6 +38,7 @@ public class MaterialController {
         return ResponseEntity.ok(ApiResponse.success(materialService.getMaterial(id)));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         materialService.deleteMaterial(id);
@@ -47,12 +50,14 @@ public class MaterialController {
         return ResponseEntity.ok(ApiResponse.success(materialService.getSpecsByMaterial(id)));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/specs")
     public ResponseEntity<ApiResponse<InspectionSpecResponse>> createSpec(
             @RequestBody @Valid InspectionSpecRequest request) {
         return ResponseEntity.ok(ApiResponse.success(materialService.createSpec(request)));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/specs/{id}")
     public ResponseEntity<ApiResponse<InspectionSpecResponse>> updateSpec(
             @PathVariable Long id,
@@ -60,6 +65,7 @@ public class MaterialController {
         return ResponseEntity.ok(ApiResponse.success(materialService.updateSpec(id, request)));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/specs/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteSpec(@PathVariable Long id) {
         materialService.deleteSpec(id);
