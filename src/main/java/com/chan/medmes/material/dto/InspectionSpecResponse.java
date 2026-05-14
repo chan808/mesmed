@@ -10,7 +10,8 @@ public record InspectionSpecResponse(
         String specDesc,
         String method,
         String equipment,
-        String timing
+        String timing,
+        int version
 ) {
     public static InspectionSpecResponse from(InspectionSpec s) {
         return new InspectionSpecResponse(
@@ -18,7 +19,8 @@ public record InspectionSpecResponse(
                 s.getRawMaterial().getId(),
                 s.getRawMaterial().getName(),
                 s.getItemName(), s.getSpecDesc(),
-                s.getMethod(), s.getEquipment(), s.getTiming()
+                s.getMethod(), s.getEquipment(), s.getTiming(),
+                s.getVersion()
         );
     }
 }

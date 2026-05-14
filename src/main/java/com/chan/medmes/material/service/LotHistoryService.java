@@ -75,7 +75,8 @@ public class LotHistoryService {
                 detail.getSpec().getItemName(),
                 detail.getSpec().getSpecDesc(),
                 detail.getMeasuredValue(),
-                detail.getResult().name()
+                detail.getResult().name(),
+                detail.getSeverity() != null ? detail.getSeverity().name() : null
         );
     }
 

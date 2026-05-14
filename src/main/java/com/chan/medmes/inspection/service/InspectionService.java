@@ -89,6 +89,7 @@ public class InspectionService {
                 .spec(spec)
                 .measuredValue(item.measuredValue())
                 .result(item.result())
+                .severity(item.severity())
                 .build();
     }
 }

@@ -36,6 +36,9 @@ public class RawMaterial {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @Builder
     public RawMaterial(String code, String name, String category, String unit, String specStandard) {
         this.code = code;
@@ -44,5 +47,9 @@ public class RawMaterial {
         this.unit = unit;
         this.specStandard = specStandard;
         this.createdAt = LocalDateTime.now();
+    }
+
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
     }
 }

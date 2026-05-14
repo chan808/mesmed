@@ -3,6 +3,7 @@ package com.chan.medmes.inspection.dto;
 import com.chan.medmes.inspection.entity.InspectionDetail;
 import com.chan.medmes.inspection.entity.InspectionRecord;
 import com.chan.medmes.inspection.enums.InspectionResult;
+import com.chan.medmes.inspection.enums.InspectionSeverity;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +24,8 @@ public record InspectionResponse(
             String itemName,
             String specDesc,
             String measuredValue,
-            InspectionResult result
+            InspectionResult result,
+            InspectionSeverity severity
     ) {
         public static DetailResponse from(InspectionDetail detail) {
             return new DetailResponse(
@@ -32,7 +34,8 @@ public record InspectionResponse(
                     detail.getSpec().getItemName(),
                     detail.getSpec().getSpecDesc(),
                     detail.getMeasuredValue(),
-                    detail.getResult()
+                    detail.getResult(),
+                    detail.getSeverity()
             );
         }
     }

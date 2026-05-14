@@ -41,6 +41,9 @@ public class Lot {
     @Column(length = 20, nullable = false)
     private LotStatus status;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @Builder
     public Lot(String lotNo, RawMaterial rawMaterial, Integer quantity,
                LocalDateTime receivedAt, String supplier) {
@@ -52,7 +55,11 @@ public class Lot {
         this.status = LotStatus.PENDING;
     }
 
-    // 관리자 수동 전이: PENDING/FAIL/HOLD → HOLD만 허용
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    // 관리자 수동 전이: PENDING/FAIL/HOLD -> HOLD 만 허용
     public void holdManually() {
         if (this.status == LotStatus.PASS) {
             throw new BusinessException(MaterialErrorCode.INVALID_STATUS_TRANSITION);

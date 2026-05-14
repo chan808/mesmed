@@ -33,7 +33,8 @@ public record LotHistoryResponse(
             String itemName,
             String specDesc,
             String measuredValue,
-            String result
+            String result,
+            String severity
     ) {}
 
     public record ProductionLogInfo(

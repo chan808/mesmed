@@ -36,6 +36,12 @@ public class MaterialController {
         return ResponseEntity.ok(ApiResponse.success(materialService.getMaterial(id)));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
+        materialService.deleteMaterial(id);
+        return ResponseEntity.ok(ApiResponse.success(null, "원자재가 삭제되었습니다."));
+    }
+
     @GetMapping("/{id}/specs")
     public ResponseEntity<ApiResponse<List<InspectionSpecResponse>>> getSpecs(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(materialService.getSpecsByMaterial(id)));
@@ -45,5 +51,18 @@ public class MaterialController {
     public ResponseEntity<ApiResponse<InspectionSpecResponse>> createSpec(
             @RequestBody @Valid InspectionSpecRequest request) {
         return ResponseEntity.ok(ApiResponse.success(materialService.createSpec(request)));
+    }
+
+    @PatchMapping("/specs/{id}")
+    public ResponseEntity<ApiResponse<InspectionSpecResponse>> updateSpec(
+            @PathVariable Long id,
+            @RequestBody @Valid InspectionSpecRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(materialService.updateSpec(id, request)));
+    }
+
+    @DeleteMapping("/specs/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteSpec(@PathVariable Long id) {
+        materialService.deleteSpec(id);
+        return ResponseEntity.ok(ApiResponse.success(null, "검사기준이 삭제되었습니다."));
     }
 }

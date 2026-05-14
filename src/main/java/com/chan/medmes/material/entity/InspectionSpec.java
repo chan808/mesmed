@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "inspection_spec")
 @Getter
@@ -35,14 +37,26 @@ public class InspectionSpec {
     @Column(length = 50)
     private String timing;
 
+    @Column(nullable = false)
+    private int version;
+
+    // null = 현행 기준, not null = 개정/삭제로 대체된 구버전
+    @Column(name = "superseded_at")
+    private LocalDateTime supersededAt;
+
     @Builder
     public InspectionSpec(RawMaterial rawMaterial, String itemName, String specDesc,
-                          String method, String equipment, String timing) {
+                          String method, String equipment, String timing, Integer version) {
         this.rawMaterial = rawMaterial;
         this.itemName = itemName;
         this.specDesc = specDesc;
         this.method = method;
         this.equipment = equipment;
         this.timing = timing;
+        this.version = (version != null) ? version : 1;
+    }
+
+    public void supersede() {
+        this.supersededAt = LocalDateTime.now();
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface InspectionSpecRepository extends JpaRepository<InspectionSpec, Long> {
-    List<InspectionSpec> findByRawMaterialId(Long rawMaterialId);
+    // 현행(개정되지 않은) 기준만 조회
+    List<InspectionSpec> findByRawMaterialIdAndSupersededAtIsNull(Long rawMaterialId);
     boolean existsByRawMaterialId(Long rawMaterialId);
 }

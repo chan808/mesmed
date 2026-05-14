@@ -1,6 +1,7 @@
 package com.chan.medmes.inspection.entity;
 
 import com.chan.medmes.inspection.enums.InspectionResult;
+import com.chan.medmes.inspection.enums.InspectionSeverity;
 import com.chan.medmes.material.entity.InspectionSpec;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -33,12 +34,18 @@ public class InspectionDetail {
     @Column(length = 10)
     private InspectionResult result;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10)
+    private InspectionSeverity severity;
+
     @Builder
     public InspectionDetail(InspectionRecord record, InspectionSpec spec,
-                            String measuredValue, InspectionResult result) {
+                            String measuredValue, InspectionResult result,
+                            InspectionSeverity severity) {
         this.record = record;
         this.spec = spec;
         this.measuredValue = measuredValue;
         this.result = result;
+        this.severity = severity;
     }
 }

@@ -49,4 +49,10 @@ public class LotController {
             @RequestBody @Valid LotStatusRequest request) {
         return ResponseEntity.ok(ApiResponse.success(materialService.updateLotStatus(id, request)));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
+        materialService.deleteLot(id);
+        return ResponseEntity.ok(ApiResponse.success(null, "LOT가 삭제되었습니다."));
+    }
 }

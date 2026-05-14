@@ -27,7 +27,8 @@ public class MaterialService {
     private final InspectionSpecRepository inspectionSpecRepository;
     private final LotRepository lotRepository;
 
-    // RawMaterial
+    // ── RawMaterial ───────────────────────────────────────────────
+
     @Transactional
     public RawMaterialResponse createMaterial(RawMaterialRequest request) {
         if (rawMaterialRepository.existsByCode(request.code())) {
@@ -46,17 +47,28 @@ public class MaterialService {
     }
 
     public List<RawMaterialResponse> getAllMaterials() {
-        return rawMaterialRepository.findAll().stream()
+        return rawMaterialRepository.findAllByDeletedAtIsNull().stream()
                 .map(RawMaterialResponse::from)
                 .toList();
     }
 
+    @Transactional
+    public void deleteMaterial(Long id) {
+        RawMaterial material = rawMaterialRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(MaterialErrorCode.MATERIAL_NOT_FOUND));
+        if (material.getDeletedAt() != null) {
+            throw new BusinessException(MaterialErrorCode.MATERIAL_ALREADY_DELETED);
+        }
+        material.softDelete();
+    }
+
     public RawMaterial findMaterialEntityById(Long id) {
-        return rawMaterialRepository.findById(id)
+        return rawMaterialRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new BusinessException(MaterialErrorCode.MATERIAL_NOT_FOUND));
     }
 
-    // InspectionSpec
+    // ── InspectionSpec ────────────────────────────────────────────
+
     @Transactional
     public InspectionSpecResponse createSpec(InspectionSpecRequest request) {
         RawMaterial material = findMaterialEntityById(request.rawMaterialId());
@@ -70,17 +82,50 @@ public class MaterialService {
 
     public List<InspectionSpecResponse> getSpecsByMaterial(Long materialId) {
         findMaterialEntityById(materialId);
-        return inspectionSpecRepository.findByRawMaterialId(materialId).stream()
+        return inspectionSpecRepository.findByRawMaterialIdAndSupersededAtIsNull(materialId).stream()
                 .map(InspectionSpecResponse::from)
                 .toList();
     }
 
     public InspectionSpec findSpecEntityById(Long id) {
+        // 이력 조회 시 구버전 spec도 로드 가능해야 하므로 삭제 필터 없음
         return inspectionSpecRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(MaterialErrorCode.SPEC_NOT_FOUND));
     }
 
-    // Lot
+    @Transactional
+    public InspectionSpecResponse updateSpec(Long id, InspectionSpecRequest request) {
+        InspectionSpec current = inspectionSpecRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(MaterialErrorCode.SPEC_NOT_FOUND));
+        if (current.getSupersededAt() != null) {
+            throw new BusinessException(MaterialErrorCode.SPEC_ALREADY_SUPERSEDED);
+        }
+        current.supersede();
+
+        InspectionSpec next = InspectionSpec.builder()
+                .rawMaterial(current.getRawMaterial())
+                .itemName(request.itemName())
+                .specDesc(request.specDesc())
+                .method(request.method())
+                .equipment(request.equipment())
+                .timing(request.timing())
+                .version(current.getVersion() + 1)
+                .build();
+        return InspectionSpecResponse.from(inspectionSpecRepository.save(next));
+    }
+
+    @Transactional
+    public void deleteSpec(Long id) {
+        InspectionSpec spec = inspectionSpecRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(MaterialErrorCode.SPEC_NOT_FOUND));
+        if (spec.getSupersededAt() != null) {
+            throw new BusinessException(MaterialErrorCode.SPEC_ALREADY_SUPERSEDED);
+        }
+        spec.supersede();
+    }
+
+    // ── Lot ───────────────────────────────────────────────────────
+
     @Transactional
     public LotResponse createLot(LotRequest request) {
         RawMaterial material = findMaterialEntityById(request.rawMaterialId());
@@ -103,7 +148,7 @@ public class MaterialService {
     }
 
     public List<LotResponse> getAllLots() {
-        return lotRepository.findAll().stream()
+        return lotRepository.findAllByDeletedAtIsNull().stream()
                 .map(LotResponse::from)
                 .toList();
     }
@@ -118,8 +163,18 @@ public class MaterialService {
         return LotResponse.from(lot);
     }
 
+    @Transactional
+    public void deleteLot(Long id) {
+        Lot lot = lotRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(MaterialErrorCode.LOT_NOT_FOUND));
+        if (lot.getDeletedAt() != null) {
+            throw new BusinessException(MaterialErrorCode.LOT_ALREADY_DELETED);
+        }
+        lot.softDelete();
+    }
+
     public Lot findLotEntityById(Long id) {
-        return lotRepository.findById(id)
+        return lotRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new BusinessException(MaterialErrorCode.LOT_NOT_FOUND));
     }
 
