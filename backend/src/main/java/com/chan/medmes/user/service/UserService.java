@@ -21,6 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // 신규 사용자를 등록하며, 아이디 중복 확인 및 비밀번호 암호화를 수행합니다.
     @Transactional
     public UserResponse createUser(UserRequest request) {
         if (userRepository.existsByUsername(request.username())) {

@@ -29,6 +29,7 @@ public class LotHistoryService {
     private final InspectionDetailRepository inspectionDetailRepository;
     private final ProductionLogRepository productionLogRepository;
 
+    // 특정 Lot의 기본 정보, 검사 이력, 생산 이력을 모두 모아 통합 히스토리 정보를 반환합니다.
     public LotHistoryResponse getHistory(Long lotId) {
         Lot lot = lotRepository.findById(lotId)
                 .orElseThrow(() -> new BusinessException(MaterialErrorCode.LOT_NOT_FOUND));

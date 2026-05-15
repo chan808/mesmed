@@ -45,7 +45,7 @@ com.chan.medmes
 │   ├── error/          ErrorCode, BusinessException, GlobalExceptionHandler
 │   ├── security/       JWT (Provider/Filter/Properties/Config), MesPrincipal, EntryPoint
 │   ├── OpenApiConfig
-│   └── DataInitializer (초기 admin 계정 생성)
+│   └── DataInitializer (원자재 6종·검사기준 20건·설비 4종·계정 3명 초기 시드)
 ├── auth/               로그인, JWT 발급
 ├── user/               사용자 CRUD, BCrypt
 ├── material/           원자재·LOT·검사기준 + LotHistoryService(이력 집계)
@@ -151,7 +151,9 @@ POST /api/inspections
 ```
 
 - **트랜잭션 보장**: Detail 저장 중 예외 발생 → Record까지 롤백.
-- **PASS/FAIL은 클라이언트(검사자)가 항목별로 입력한 결과 기반.** 서버는 집계만 한다. (정량 자동 판정 미구현 — 개선점 참조)
+- **PASS/FAIL 판정**: `MeasureType`에 따라 자동/수동 분기.
+  - `NUMERIC`: 측정값을 `minValue/maxValue` 범위와 비교해 서버가 자동 판정.
+  - `VISUAL`: 검사자가 직접 PASS/FAIL 입력.
 
 ### 6.3 LOT 상태 전이
 
@@ -303,22 +305,20 @@ FAIL/HOLD ─(재검사 후)─────────→ PASS/FAIL [Inspection
 
 ---
 
-## 11. 한계 및 개선점 (질문 들어오기 전에 먼저 짚을 것들)
+## 11. 한계 및 개선점
 
 ### 높음 — 사업계획서가 직접 요구하는데 비어 있음
-1. **InspectionSpec에 정량 판정 필드 없음**
-   - 현재 `specDesc`가 문자열 ("30mm ± 1mm")이라 자동 판정 불가, 검사자가 PASS/FAIL 직접 선택.
-   - 개선안: `minValue/maxValue/unit/measureType(NUMERIC|VISUAL)` 추가 → Service가 측정값을 보고 자동 판정.
+1. ~~**InspectionSpec에 정량 판정 필드 없음**~~ → **✅ 해결**: `measureType(NUMERIC|VISUAL)`, `minValue`, `maxValue`, `unit` 필드 및 `judgeNumeric()` 자동판정 구현 완료.
 2. **LOT 이력 정확도 통계 API 없음** (성과지표 5번 직결)
 3. **이미지 업로드 골격 없음** — 사업계획서 표 4가 "이미지 데이터화"를 명시. 1차 단계에선 AI 없이 첨부 사진만 LOT에 묶어도 의미 있음.
 
 ### 중간 — 코드 품질/일관성
-4. **VisionInspectionController가 더미 200 OK 반환** — 호출자가 성공으로 오해 가능. 제거하거나 501 반환 권장.
+4. ~~**VisionInspectionController가 더미 200 OK 반환**~~ → **✅ 해결**: `HttpStatus.NOT_IMPLEMENTED`(501) 반환으로 수정됨.
 5. **Enum 위치 불일치** — `user/UserRole`, `material/LotStatus`가 `enums/` 디렉토리 밖. CLAUDE.md 규칙 위반.
-6. **PRD.md 구현 현황 표가 코드 현실과 불일치** — material/inspection/production이 "구현 중"으로 표기되어 있으나 실제로는 완료.
-7. **N+1 쿼리 가능성** (`LotHistoryService`)
-   - record별로 detail 추가 조회. LOT 이력 = 핵심 API. fetch join 또는 `@EntityGraph` 적용 권장.
-8. **DataInitializer 시드 부족** — admin 1명만. CLAUDE.md에 명시된 원자재 6종/검사기준 14건은 매번 수동 등록.
+6. ~~**PRD.md 구현 현황 표가 코드 현실과 불일치**~~ → **✅ 해결**: Phase 1~4 완료, 시드 데이터·프론트엔드 현황 반영 완료.
+7. **N+1 쿼리 가능성** (`InspectionService.getInspectionsByLot`)
+   - record별로 detail 추가 조회. `findByRecord_IdIn` 배치 조회로 개선 권장 (LotHistoryService에는 이미 적용됨).
+8. ~~**DataInitializer 시드 부족**~~ → **✅ 해결**: 원자재 6종·검사기준 20건·설비 4종·계정 3개 자동 생성 완료.
 
 ### 낮음 — 있으면 좋음
 9. 단위 테스트 — 현재 `InspectionServiceTest`, `MaterialServiceTest`만. ProductionService(PASS LOT 검증), LotHistoryService, DashboardService 커버리지 필요.
@@ -385,7 +385,11 @@ FAIL/HOLD ─(재검사 후)─────────→ PASS/FAIL [Inspection
 ```
 
 - 환경변수: `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `JWT_EXPIRATION_MS`
-- 초기 계정: `admin / admin123` (DataInitializer가 빈 DB에 1회 생성)
+- 초기 계정 (DataInitializer 자동 생성):
+  - `admin / admin123` (ADMIN)
+  - `inspector / inspector123` (INSPECTOR)
+  - `operator / operator123` (OPERATOR)
+- 시드 데이터: 원자재 6종(RM-001~006) + 검사기준 20건 + 설비 4종 자동 등록
 - Swagger: `http://localhost:8080/swagger-ui.html`
 
 ---
@@ -395,5 +399,6 @@ FAIL/HOLD ─(재검사 후)─────────→ PASS/FAIL [Inspection
 > "**의료장비 원자재 수입검사를 종이에서 DB로 옮기고, LOT 번호 하나로 입고부터 생산까지 추적하는 Spring Boot 백엔드**예요.
 > 핵심 API는 `GET /api/lots/{id}/history` 하나로 그 LOT의 입고·검사 항목별 실측값·생산 이력을 한 번에 반환하는 거고요.
 > 수입검사를 등록하면 Service가 자동으로 LOT 상태를 PASS/FAIL로 전이시키고, PASS 아닌 LOT는 생산 라인 등록 자체를 막아요.
+> NUMERIC 검사기준은 측정값을 minValue/maxValue 범위와 비교해 서버가 자동 판정하고, VISUAL 검사는 검사자가 직접 PASS/FAIL을 선택해요.
 > AI 비전·클라우드 이중화·PLC 연동은 R&D 사업계획서 2~3년차 영역이라 OJT 범위에서 의도적으로 제외했고, ADR에 결정 근거를 남겨놨어요.
-> 지금 부족한 건 정량 자동 판정 필드, 이력 통계 API, 이미지 업로드 골격 — 이 셋이 사업계획서와 직접 매핑되는 다음 단계예요."
+> 앱 실행 시 OJT 기준서의 원자재 6종·검사기준 20건·설비 4종이 자동 시드되어 별도 등록 없이 바로 검사 등록까지 시연할 수 있어요."

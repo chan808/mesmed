@@ -32,6 +32,7 @@ public class ProductionService {
 
     // ── Equipment ─────────────────────────────────────────────────
 
+    // 새로운 설비를 등록하며, 설비 코드의 중복을 검증합니다.
     @Transactional
     public EquipmentResponse createEquipment(EquipmentRequest request) {
         if (equipmentRepository.existsByEquipmentCode(request.equipmentCode())) {
@@ -50,6 +51,7 @@ public class ProductionService {
                 .toList();
     }
 
+    // 설비의 현재 운영 상태(RUNNING, STOPPED, MAINTENANCE 등)를 변경합니다.
     @Transactional
     public EquipmentResponse updateEquipmentStatus(Long id, EquipmentStatusRequest request) {
         Equipment equipment = findEquipmentEntityById(id);
@@ -64,6 +66,7 @@ public class ProductionService {
 
     // ── ProductionLog ─────────────────────────────────────────────
 
+    // 합격(PASS) 상태인 Lot에 대해 특정 설비에서의 생산 및 불량 내역(생산 로그)을 기록합니다.
     @Transactional
     public ProductionLogResponse createProductionLog(ProductionLogRequest request) {
         Lot lot = materialService.findLotEntityById(request.lotId());
@@ -107,6 +110,7 @@ public class ProductionService {
 
     // ── AlarmLog ──────────────────────────────────────────────────
 
+    // 설비에서 발생한 오류나 경고를 알람 로그로 등록합니다.
     @Transactional
     public AlarmResponse createAlarm(AlarmRequest request) {
         Equipment equipment = findEquipmentEntityById(request.equipmentId());
@@ -131,6 +135,7 @@ public class ProductionService {
                 .toList();
     }
 
+    // 현재 진행 중인 알람 내역을 조치 완료 상태(Resolved)로 처리합니다.
     @Transactional
     public AlarmResponse resolveAlarm(Long id) {
         AlarmLog alarm = alarmLogRepository.findById(id)

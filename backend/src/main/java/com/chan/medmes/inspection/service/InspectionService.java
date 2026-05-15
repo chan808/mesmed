@@ -33,6 +33,7 @@ public class InspectionService {
     private final MaterialService materialService;
     private final UserService userService;
 
+    // 특정 Lot에 대한 검사 내역 및 세부 항목 결과를 등록하고, 최종 Lot 합격/불합격 상태를 갱신합니다.
     @Transactional
     public InspectionResponse createInspection(InspectionRequest request) {
         Lot lot = materialService.findLotEntityById(request.lotId());
@@ -77,6 +78,7 @@ public class InspectionService {
                 .toList();
     }
 
+    // 검사 스펙을 기반으로 개별 세부 항목의 검사 결과를 생성하며, 정량적 수치형(NUMERIC)인 경우 합격 범위를 판정합니다.
     private InspectionDetail buildDetail(InspectionRecord record, InspectionDetailItem item) {
         InspectionSpec spec = materialService.findSpecEntityById(item.inspectionSpecId());
 

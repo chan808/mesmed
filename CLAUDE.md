@@ -96,11 +96,11 @@ PASS가 아닌 LOT에 생산 이력 등록 시 → `LOT_NOT_PASSED` 예외
 | Phase | 내용 | 상태 |
 |---|---|---|
 | 0 | 프로젝트 세팅, global / auth / user | ✅ |
-| 1 | material 도메인 (원자재, LOT, 검사기준) | 🔄 구현 중 |
-| 2 | inspection 도메인 (수입검사 자동 판정) | 🔄 구현 중 |
-| 3 | production 도메인 (설비, 생산, 알람) | 🔄 구현 중 |
-| 4 | LotHistoryService 완성 + Service 단위 테스트 | ⬜ |
-| 5 | 운영 준비 (ddl validate, 시드 데이터, 배포 설정) | ⬜ |
+| 1 | material 도메인 (원자재, LOT, 검사기준) | ✅ |
+| 2 | inspection 도메인 (수입검사 자동 판정) | ✅ |
+| 3 | production 도메인 (설비, 생산, 알람) | ✅ |
+| 4 | LotHistoryService 완성 + Service 단위 테스트 | ✅ |
+| 5 | 운영 준비 (ddl validate, 시드 데이터, 배포 설정) | 🔄 시드 완료 |
 
 ## Common Commands
 
