@@ -29,6 +29,7 @@ public class MaterialService {
 
     // ── RawMaterial ───────────────────────────────────────────────
 
+    // 신규 자재(원자재 등)를 생성하며, 코드 중복 여부를 검증합니다.
     @Transactional
     public RawMaterialResponse createMaterial(RawMaterialRequest request) {
         if (rawMaterialRepository.existsByCode(request.code())) {
@@ -52,6 +53,7 @@ public class MaterialService {
                 .toList();
     }
 
+    // 자재 정보를 Soft Delete 방식으로 삭제하며, 이미 삭제된 경우 예외를 발생시킵니다.
     @Transactional
     public void deleteMaterial(Long id) {
         RawMaterial material = rawMaterialRepository.findById(id)
@@ -69,6 +71,7 @@ public class MaterialService {
 
     // ── InspectionSpec ────────────────────────────────────────────
 
+    // 특정 자재에 대한 신규 검사 스펙을 등록합니다.
     @Transactional
     public InspectionSpecResponse createSpec(InspectionSpecRequest request) {
         RawMaterial material = findMaterialEntityById(request.rawMaterialId());
@@ -103,6 +106,7 @@ public class MaterialService {
                 .orElseThrow(() -> new BusinessException(MaterialErrorCode.SPEC_NOT_FOUND));
     }
 
+    // 기존 스펙을 무효화(Supersede)하고, 버전을 올려 새로운 스펙으로 갱신합니다.
     @Transactional
     public InspectionSpecResponse updateSpec(Long id, InspectionSpecRequest request) {
         InspectionSpec current = inspectionSpecRepository.findById(id)
@@ -131,6 +135,7 @@ public class MaterialService {
         return InspectionSpecResponse.from(inspectionSpecRepository.save(next));
     }
 
+    // 검사 스펙을 논리적으로 무효화(Supersede) 처리하여 삭제를 대신합니다.
     @Transactional
     public void deleteSpec(Long id) {
         InspectionSpec spec = inspectionSpecRepository.findById(id)
@@ -143,6 +148,7 @@ public class MaterialService {
 
     // ── Lot ───────────────────────────────────────────────────────
 
+    // 자재 입고 시 새로운 Lot를 생성하며, Lot 번호가 없으면 자동 생성합니다.
     @Transactional
     public LotResponse createLot(LotRequest request) {
         RawMaterial material = findMaterialEntityById(request.rawMaterialId());
@@ -170,6 +176,7 @@ public class MaterialService {
                 .toList();
     }
 
+    // Lot의 상태를 수동으로 보류(HOLD) 상태로 변경하며 상태 전환 가능 여부를 검증합니다.
     @Transactional
     public LotResponse updateLotStatus(Long id, LotStatusRequest request) {
         Lot lot = findLotEntityById(id);
@@ -180,6 +187,7 @@ public class MaterialService {
         return LotResponse.from(lot);
     }
 
+    // Lot 정보를 Soft Delete 방식으로 삭제 처리합니다.
     @Transactional
     public void deleteLot(Long id) {
         Lot lot = lotRepository.findById(id)
@@ -195,6 +203,7 @@ public class MaterialService {
                 .orElseThrow(() -> new BusinessException(MaterialErrorCode.LOT_NOT_FOUND));
     }
 
+    // 'LOT-yyyyMMdd-일련번호' 형식으로 새로운 Lot 번호를 자동 생성합니다.
     private String generateLotNo() {
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String prefix = "LOT-" + date + "-";

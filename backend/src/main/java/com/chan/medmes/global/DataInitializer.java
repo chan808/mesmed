@@ -403,23 +403,23 @@ public class DataInitializer implements ApplicationRunner {
         if (equipmentRepository.count() > 0) return;
 
         equipmentRepository.save(Equipment.builder()
-                .equipmentCode("EQ-ECG-001")
-                .name("ECG 시뮬레이터")
+                .equipmentCode("EQ-COAT-001")
+                .name("점착제 코팅기")
                 .build());
 
         equipmentRepository.save(Equipment.builder()
-                .equipmentCode("EQ-CAL-001")
-                .name("내/외측 캘리퍼")
+                .equipmentCode("EQ-SMT-001")
+                .name("SMT 설비")
                 .build());
 
         equipmentRepository.save(Equipment.builder()
-                .equipmentCode("EQ-DMM-001")
-                .name("디지털 멀티미터")
+                .equipmentCode("EQ-ASSY-001")
+                .name("조립 설비")
                 .build());
 
         equipmentRepository.save(Equipment.builder()
-                .equipmentCode("EQ-STW-001")
-                .name("스톱워치")
+                .equipmentCode("EQ-PACK-001")
+                .name("포장기")
                 .build());
 
         log.info("설비 4종 시드 데이터 생성 완료");

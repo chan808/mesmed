@@ -29,6 +29,7 @@ public class DashboardService {
     private final EquipmentRepository equipmentRepository;
     private final LotRepository lotRepository;
 
+    // 금일 총 생산량, 활성 알람 수, 설비 가동 상태 및 Lot 현황 등을 집계하여 대시보드 데이터를 생성합니다.
     public DashboardResponse getDashboard() {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
 
@@ -49,6 +50,7 @@ public class DashboardService {
         );
     }
 
+    // 최근 7일간의 일자별 총 생산량 추이 데이터를 조회합니다. 빈 날짜는 0으로 채워 반환합니다.
     public List<DailyProductionDto> getDailyProduction() {
         LocalDateTime start = LocalDate.now().minusDays(6).atStartOfDay();
         List<Object[]> rows = productionLogRepository.findDailyProductionSince(start);
