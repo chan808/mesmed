@@ -15,4 +15,9 @@ public interface ProductionLogRepository extends JpaRepository<ProductionLog, Lo
 
     @Query("SELECT COALESCE(SUM(p.producedQty), 0) FROM ProductionLog p WHERE p.startedAt >= :start")
     int sumTodayProducedQty(LocalDateTime start);
+
+    @Query(value = "SELECT CAST(started_at AS DATE) AS date, COALESCE(SUM(produced_qty), 0) AS qty " +
+                   "FROM production_log WHERE started_at >= :start " +
+                   "GROUP BY CAST(started_at AS DATE) ORDER BY CAST(started_at AS DATE)", nativeQuery = true)
+    List<Object[]> findDailyProductionSince(LocalDateTime start);
 }
